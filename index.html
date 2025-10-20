@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Diwali 💖</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+  body {
+    background: radial-gradient(circle at bottom, #0a043c, #000);
+    color: white;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .page {
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    transition: opacity 1s ease;
+  }
+
+  .active { display: flex; }
+
+  h1 {
+    font-size: 3rem;
+    text-shadow: 0 0 20px #ffb347, 0 0 40px #ff9d00;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.2rem;
+    max-width: 700px;
+    color: #ddd;
+  }
+
+  button {
+    margin-top: 30px;
+    padding: 12px 35px;
+    background: linear-gradient(90deg, #ff9d00, #ffb347);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 0 20px #ffb347;
+    transition: transform 0.2s;
+  }
+
+  button:hover { transform: scale(1.05); }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  /* Floating hearts / petals */
+  .floating {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+  }
+  .heart, .petal {
+    position: absolute;
+    font-size: 24px;
+    animation: float 6s linear infinite;
+    opacity: 0.8;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) scale(0.6); opacity: 0.8; }
+    100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+  }
+
+  /* Romantic glow */
+  .glow {
+    animation: glow 1.5s infinite alternate;
+  }
+  @keyframes glow {
+    from { text-shadow: 0 0 10px #ff9d00; }
+    to { text-shadow: 0 0 30px #ffb347, 0 0 60px #ff9d00; }
+  }
+
+  /* Yes/No Buttons */
+  .choice-buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 40px;
+  }
+  .no-btn {
+    background: linear-gradient(90deg, #ff4d4d, #ff8080);
+    box-shadow: 0 0 20px #ff4d4d;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <h1 class="glow">🎆 Happy Diwali Suku 🎇</h1>
+  <p>May this Diwali fill your life with endless light, joy, laughter, and love.</p>
+  <button onclick="nextPage(2)">Next ➤</button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <h1>✨ You Know What's Brighter Than The Diyas?</h1>
+  <p>That sparkle in your eyes every time you smile 💫<br>
+  You’re the real festival of light in my life ❤️</p>
+  <button onclick="nextPage(3)">Next ➤</button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+  <h1>💖 You’re Sweeter Than Kaju Katli 💖</h1>
+  <p>And every Diwali light reminds me of how lucky I am<br>
+  to have met someone like you — warm, pure, and glowing 🌟</p>
+  <button onclick="nextPage(4)">Next ➤</button>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page" id="page4">
+  <h1>🌹 A Small Confession 🌹</h1>
+  <p>Every diya I light this Diwali<br>
+  secretly carries one wish...<br>
+  <strong>To make you mine forever 💍</strong></p>
+  <button onclick="nextPage(5)">Next ➤</button>
+</div>
+
+<!-- PAGE 5 (Proposal) -->
+<div class="page" id="page5">
+  <div class="floating" id="floating"></div>
+  <h1 class="glow">💞 Will You Be My Diwali Forever? 💞</h1>
+  <p>Because without you, even the brightest fireworks feel dim 🎇<br>
+  With you, every day would sparkle like a festival of love 💖</p>
+  <div class="choice-buttons">
+    <button onclick="sayYes()">💗 Yes 💗</button>
+    <button class="no-btn" onclick="sayNo()">🙈 No 🙈</button>
+  </div>
+</div>
+
+<script>
+  // -------- FIREWORKS ANIMATION --------
+  const canvas = document.getElementById('fireworks');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  function random(min, max){ return Math.random() * (max - min) + min; }
+
+  function createParticle(x, y, color){
+    return {x, y, color, radius: random(1,3), speedX: random(-4,4), speedY: random(-4,4), alpha: 1};
+  }
+
+  function explode(){
+    const x = random(100, canvas.width - 100);
+    const y = random(100, canvas.height / 2);
+    const color = `hsl(${random(0,360)},100%,60%)`;
+    for(let i=0;i<60;i++) particles.push(createParticle(x, y, color));
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach((p,i)=>{
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.alpha -= 0.02;
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+      ctx.fill();
+      if(p.alpha <= 0) particles.splice(i,1);
+    });
+    requestAnimationFrame(draw);
+  }
+
+  setInterval(explode, 1000);
+  draw();
+
+  // -------- PAGE NAVIGATION --------
+  function nextPage(num){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page'+num).classList.add('active');
+  }
+
+  // -------- HEARTS + PETALS ANIMATION --------
+  function showLove(){
+    const container = document.getElementById('floating');
+    setInterval(()=>{
+      const el = document.createElement('div');
+      el.classList.add(Math.random() > 0.5 ? 'heart' : 'petal');
+      el.innerHTML = Math.random() > 0.5 ? '💖' : '🌸';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = Math.random() * 3 + 3 + 's';
+      container.appendChild(el);
+      setTimeout(()=>el.remove(),6000);
+    },200);
+  }
+
+  showLove();
+
+  // -------- YES / NO LOGIC --------
+  let noCount = 0;
+  function sayYes(){
+    window.open("https://www.instagram.com/YOUR_INSTAGRAM_LINK_HERE", "_blank");
+  }
+
+  function sayNo(){
+    noCount++;
+    if(noCount === 1){
+      alert("Aww come on 😅 Give it another thought 💖");
+    } else if(noCount === 2){
+      alert("Okay... but you’ll miss the cutest Diwali proposal ever 😢");
+      window.close();
+    }
+  }
+</script>
+</body>
+</html>
